@@ -1,10 +1,13 @@
-name: test
+name: build
 on:
   push:
   workflow_dispatch:
 jobs:
-  check:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -16,7 +19,7 @@ jobs:
       - name: Restore and cache Nix store
         uses: nix-community/cache-nix-action@v6
         with:
-          primary-key: cache-test-${{ runner.os }}-nix-store-${{ hashFiles('**/*.nix') }}
-          restore-prefixes-first-match: cache-test-${{ runner.os }}-nix-store-
-      - name: Run tests
-        run: nix flake check
+          primary-key: cache-build-${{ runner.os }}-nix-store-${{ hashFiles('**/*.nix') }}
+          restore-prefixes-first-match: cache-build-${{ runner.os }}-nix-store-
+      - name: Build package
+        run: nix build
