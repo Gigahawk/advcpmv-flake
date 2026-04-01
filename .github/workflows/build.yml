@@ -1,0 +1,25 @@
+name: build
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v34
+        with:
+          nix_version: "2.31.2"
+      - name: Restore and cache Nix store
+        uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: cache-build-${{ runner.os }}-nix-store-${{ hashFiles('**/*.nix') }}
+          restore-prefixes-first-match: cache-build-${{ runner.os }}-nix-store-
+      - name: Build package
+        run: nix build
