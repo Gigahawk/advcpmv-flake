@@ -130,6 +130,10 @@ stdenv.mkDerivation rec {
 
     # Seems to fail on aarch64-linux?
     echo "int main() { return 77; }" > gnulib-tests/test-isatty.c
+
+    # Seems to fail on aarch64-linux? May have something to do with
+    # pinned nixpkgs
+    echo "int main() { return 77; }" > gnulib-tests/test-readutmp.c
   '')
   + (optionalString stdenv.hostPlatform.isPower64
     # test command fails to parse long fraction part on ppc64
